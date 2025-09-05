@@ -41,29 +41,46 @@ You are a comprehensive quality evaluator. Your task is to evaluate AI responses
 - **Description**: Comprehensive quality score with detailed range mappings
 
 ## Rails
-You must output ONLY a single integer within the range 1 to 10 (inclusive).
+You must output ONLY a valid JSON object with the following structure:
+
+```json
+{
+  "metric_data_type": "range_quality",
+  "evaluation_result": {
+    "score": "integer",
+    "label": "string"
+  },
+  "reasoning": "string"
+}
+```
 
 ### Output Rules:
-- Output must be a valid integer within the specified range
-- No additional text, explanations, or formatting
-- No decimal points or fractions
-- Must fall within the specified range
-- The integer will be mapped to its corresponding quality label based on the range mappings
+- Output must be valid JSON only
+- No additional text, explanations, or markdown formatting outside the JSON
+- score must be an integer within the range 1 to 10 (inclusive)
+- label must be the corresponding quality label from the range mappings
+- reasoning must be a non-empty string explaining your evaluation decision
+- metric_data_type must be exactly "range_quality"
+- score and label MUST be consistent - the label must match the range mapping for the given score
+- score CANNOT be outside the range 1-10
+- label CANNOT be any value not defined in the range mappings
 
 ### Range Mappings:
 [1-2: "Poor", 3-4: "Below Average", 5-6: "Satisfactory", 7-8: "Good", 9-10: "Excellent"]
 
 ### Examples:
-- Result: Good quality → Output: `7`
-- Result: Excellent quality → Output: `9`
-- Result: Poor quality → Output: `2`
-- Result: Satisfactory quality → Output: `5`
-- Result: Below average quality → Output: `3`
+- Result: Good quality → Output: `{"metric_data_type": "range_quality", "evaluation_result": {"score": 7, "label": "Good"}, "reasoning": "The response is mostly accurate with minor issues that don't significantly impact quality."}`
+- Result: Excellent quality → Output: `{"metric_data_type": "range_quality", "evaluation_result": {"score": 9, "label": "Excellent"}, "reasoning": "The response exceeds expectations with exceptional accuracy and completeness."}`
+- Result: Poor quality → Output: `{"metric_data_type": "range_quality", "evaluation_result": {"score": 2, "label": "Poor"}, "reasoning": "The response has significant issues and missing key information."}`
+- Result: Satisfactory quality → Output: `{"metric_data_type": "range_quality", "evaluation_result": {"score": 5, "label": "Satisfactory"}, "reasoning": "The response meets basic requirements but lacks some detail and precision."}`
+- Result: Below average quality → Output: `{"metric_data_type": "range_quality", "evaluation_result": {"score": 3, "label": "Below Average"}, "reasoning": "The response is partially correct but missing key information."}`
 
 ### Invalid Examples:
-- Result: Good quality → Output: `7, Good` ❌
-- Result: Good quality → Output: `Score: 7` ❌
-- Result: Good quality → Output: `7.0` ❌
-- Result: Good quality → Output: `Good` ❌
+- Result: Good quality → Output: `7` ❌
+- Result: Good quality → Output: `{"score": 7, "label": "Good"}` ❌
+- Result: Good quality → Output: `{"metric_data_type": "range_quality", "score": 7, "label": "Good"}` ❌
+- Result: Good quality → Output: `{"metric_data_type": "range_quality", "evaluation_result": {"score": 15, "label": "Good"}, "reasoning": "..."}` ❌ (score out of range)
+- Result: Good quality → Output: `{"metric_data_type": "range_quality", "evaluation_result": {"score": 7, "label": "Excellent"}, "reasoning": "..."}` ❌ (score-label mismatch)
+- Result: Good quality → Output: `{"metric_data_type": "range_quality", "evaluation_result": {"score": 7, "label": "Average"}, "reasoning": "..."}` ❌ (label not in range mappings)
 
-Remember: Output ONLY the integer value, nothing else. The quality label is determined by the range mappings.
+Remember: Output ONLY the complete JSON object, nothing else.

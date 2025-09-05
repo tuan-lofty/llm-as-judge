@@ -33,4 +33,9 @@ You are a {evaluator_role_description}. Your task is to {evaluation_task_descrip
 {metric_prompt}
 
 ## Output Format
-Follow the Rails section in the Metric Configuration above. Output ONLY the value specified by the metric, with no additional text or formatting.
+Follow the Rails section in the Metric Configuration above. You must output a JSON object with:
+- **metric_data_type**: The type of metric being used
+- **evaluation_result**: The evaluation result (score, label, or both depending on metric type)
+- **reasoning**: A detailed explanation of your evaluation decision based on the reasoning process above
+
+Output ONLY the complete JSON object, with no additional text or formatting.
